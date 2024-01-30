@@ -1,0 +1,15 @@
+[package]
+name = "tokio"
+# When releasing to crates.io:
+# - Remove path dependencies
+# - Update doc url
+#   - README.md
+# - Update CHANGELOG.md.
+# - Create "v1.x.y" git tag.
+version = "1.35.1"
+edition = "2021"
+rust-version = "1.63"
+
+[features]
+# Include nothing by default
+default = []
