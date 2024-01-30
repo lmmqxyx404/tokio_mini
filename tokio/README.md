@@ -7,7 +7,7 @@ learn tokio code
    - `atomic_usize::AtomicUsize`(Used for `State`)
    - `loom::std::UnsafeCell`(Used for `Header`)
 
-# about basic struct.
+# About basic struct and enum.
 ## 1.AtomicUsize
 independent
 
@@ -26,3 +26,7 @@ main is 4
 ## 6.JoinHandle
 used for `spawn_blocking<F, R>(func: F) -> JoinHandle<R>`
 in runtime::blocking::poll
+
+## 7.Handle
+### 7.1 runtime::Handle(struct)
+### 7.2 runtime::scheduler::Handle(enum)
