@@ -26,6 +26,21 @@ pub(crate) enum Handle {
 
 cfg_rt! {
     use crate::runtime::context;
+    use crate::runtime::{blocking};
+
+    macro_rules! match_flavor {
+        ($self:expr, $ty:ident($h:ident) => $e:expr) => {
+            match $self {
+                $ty::CurrentThread($h) => $e,
+
+                #[cfg(feature = "rt-multi-thread")]
+                $ty::MultiThread($h) => $e,
+
+                #[cfg(all(tokio_unstable, feature = "rt-multi-thread"))]
+                $ty::MultiThreadAlt($h) => $e,
+            }
+        }
+    }
 
     impl Handle {
         #[track_caller]
@@ -34,6 +49,10 @@ cfg_rt! {
                 Ok(handle) => handle,
                 Err(e) => panic!("{}", e),
             }
+        }
+
+        pub(crate) fn blocking_spawner(&self) -> &blocking::Spawner {
+            todo!() // match_flavor!(self, Handle(h) => &h.blocking_spawner)
         }
     }
 }

@@ -98,7 +98,7 @@ impl Handle {
         F: FnOnce() -> R + Send + 'static,
         R: Send + 'static,
     {
-        todo!()
+        self.inner.blocking_spawner().spawn_blocking(self, func)
     }
     // todo: add more fn.
 }
