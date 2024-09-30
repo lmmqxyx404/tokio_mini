@@ -12,10 +12,16 @@ rust-version = "1.63"
 
 [features]
 # Include nothing by default
-default = ["rt"]
+default = ["full"]
 rt = []
 
-# enable everything
-full = ["rt", "sync"]
+full = ["rt", "sync", "net", "process", "signal"]
 
+# enable everything
 sync = []
+# todo: add more deps
+net = []
+
+process = []
+
+signal = []

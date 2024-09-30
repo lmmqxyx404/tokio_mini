@@ -23,3 +23,38 @@ macro_rules! cfg_not_sync {
       $( #[cfg(not(feature = "sync"))] $item )*
   }
 }
+
+macro_rules! cfg_io_driver {
+  ($($item:item)*) => {
+      $(
+          #[cfg(any(
+              feature = "net",
+              all(unix, feature = "process"),
+              all(unix, feature = "signal"),
+          ))]
+          #[cfg_attr(docsrs, doc(cfg(any(
+              feature = "net",
+              all(unix, feature = "process"),
+              all(unix, feature = "signal"),
+          ))))]
+          $item
+      )*
+  }
+}
+
+macro_rules! cfg_signal_internal {
+  ($($item:item)*) => {
+      $(
+          #[cfg(any(feature = "signal", all(unix, feature = "process")))]
+          #[cfg(not(loom))]
+          $item
+      )*
+  }
+}
+
+macro_rules! cfg_signal_internal_and_unix {
+  ($($item:item)*) => {
+      #[cfg(unix)]
+      cfg_signal_internal! { $($item)* }
+  }
+}

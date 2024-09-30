@@ -1,4 +1,5 @@
 use std::io;
+use std::time::Duration;
 
 use crate::runtime::{blocking, driver, Runtime};
 
@@ -7,6 +8,8 @@ pub struct Builder {
     kind: Kind,
     /// Cap on thread usage.
     max_blocking_threads: usize,
+    /// Customizable keep alive timeout for `BlockingPool`
+    pub(super) keep_alive: Option<Duration>,
 }
 
 impl Builder {
@@ -36,6 +39,8 @@ impl Builder {
         Builder {
             kind,
             max_blocking_threads: 512,
+
+            keep_alive: None,
         }
     }
 
@@ -49,13 +54,13 @@ impl Builder {
         let (driver, driver_handle) = driver::Driver::new(self.get_cfg(1))?;
 
         // Blocking pool
-        let blocking_pool = blocking::create_blocking_pool(self, self.max_blocking_threads);
+        // let blocking_pool = blocking::create_blocking_pool(self, self.max_blocking_threads);
 
         todo!()
     }
 
     fn get_cfg(&self, workers: usize) -> driver::Cfg {
-        driver::Cfg {}
+        todo!() // driver::Cfg {}
     }
 }
 
