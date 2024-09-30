@@ -1,10 +1,12 @@
 use std::io;
 
-use crate::runtime::{driver, Runtime};
+use crate::runtime::{blocking, driver, Runtime};
 
 pub struct Builder {
     /// Runtime type
     kind: Kind,
+    /// Cap on thread usage.
+    max_blocking_threads: usize,
 }
 
 impl Builder {
@@ -31,7 +33,10 @@ impl Builder {
     ///
     /// Configuration methods can be chained on the return value.
     pub(crate) fn new(kind: Kind, event_interval: u32) -> Builder {
-        Builder { kind }
+        Builder {
+            kind,
+            max_blocking_threads: 512,
+        }
     }
 
     pub fn build(&mut self) -> io::Result<Runtime> {
@@ -42,6 +47,9 @@ impl Builder {
 
     fn build_current_thread_runtime(&mut self) -> io::Result<Runtime> {
         let (driver, driver_handle) = driver::Driver::new(self.get_cfg(1))?;
+
+        // Blocking pool
+        let blocking_pool = blocking::create_blocking_pool(self, self.max_blocking_threads);
 
         todo!()
     }
