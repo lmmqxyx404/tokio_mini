@@ -1,7 +1,9 @@
 use crate::loom::sync::Arc;
+use crate::runtime::blocking::shutdown;
 use crate::runtime::task::JoinHandle;
 use crate::runtime::{Builder, Handle};
-use crate::runtime::blocking::{shutdown};
+
+use std::time::Duration;
 
 /// Runs the provided function on an executor dedicated to blocking operations.
 /// Tasks will be scheduled as non-mandatory, meaning they may not get executed
@@ -45,7 +47,10 @@ pub(crate) struct BlockingPool {}
 impl BlockingPool {
     pub(crate) fn new(builder: &Builder, thread_cap: usize) -> BlockingPool {
         let (shutdown_tx, shutdown_rx) = shutdown::channel();
+        let keep_alive = builder.keep_alive.unwrap_or(KEEP_ALIVE);
 
-        todo!()
+        BlockingPool {}
     }
 }
+
+const KEEP_ALIVE: Duration = Duration::from_secs(10);

@@ -21,3 +21,8 @@ cfg_rt! {
 }
 
 mod driver;
+
+
+cfg_signal_internal_and_unix! {
+    pub(crate) mod signal;
+}
