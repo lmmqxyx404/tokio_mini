@@ -1,6 +1,6 @@
 use std::io;
 
-use crate::runtime::Runtime;
+use crate::runtime::{driver, Runtime};
 
 pub struct Builder {
     /// Runtime type
@@ -41,7 +41,13 @@ impl Builder {
     }
 
     fn build_current_thread_runtime(&mut self) -> io::Result<Runtime> {
+        let (driver, driver_handle) = driver::Driver::new(self.get_cfg(1))?;
+
         todo!()
+    }
+
+    fn get_cfg(&self, workers: usize) -> driver::Cfg {
+        driver::Cfg {}
     }
 }
 
