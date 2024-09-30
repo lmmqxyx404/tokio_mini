@@ -14,3 +14,11 @@ pub mod runtime;
 mod loom;
 
 mod util;
+
+cfg_sync! {
+  pub mod sync;
+}
+
+cfg_not_sync! {
+  mod sync;
+}
