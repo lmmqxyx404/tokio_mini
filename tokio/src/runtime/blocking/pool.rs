@@ -13,7 +13,5 @@ where
 {
     // todo:1 handle is the start then is relative fn.
     let rt = Handle::current();
-    todo!()
-
-    // rt.spawn_blocking(func)
+    rt.spawn_blocking(func)
 }

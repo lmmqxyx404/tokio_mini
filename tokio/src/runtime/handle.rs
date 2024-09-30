@@ -2,6 +2,8 @@ use crate::runtime::{context, scheduler};
 
 use std::{fmt, marker::PhantomData};
 
+use crate::runtime::task::JoinHandle;
+
 /// Handle to the runtime.
 ///
 /// The handle is internally reference-counted and can be freely cloned. A handle can be
@@ -88,6 +90,15 @@ impl Handle {
         Handle {
             inner: scheduler::Handle::current(),
         }
+    }
+
+    #[track_caller]
+    pub fn spawn_blocking<F, R>(&self, func: F) -> JoinHandle<R>
+    where
+        F: FnOnce() -> R + Send + 'static,
+        R: Send + 'static,
+    {
+        todo!()
     }
     // todo: add more fn.
 }
