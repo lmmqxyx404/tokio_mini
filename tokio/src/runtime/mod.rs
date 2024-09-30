@@ -15,4 +15,7 @@ pub(crate) mod context;
 cfg_rt! {
     mod builder;
     pub use self::builder::Builder;
+
+    mod runtime;
+    pub use runtime::{Runtime};
 }
