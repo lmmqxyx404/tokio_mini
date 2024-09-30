@@ -16,4 +16,6 @@ default = ["rt"]
 rt = []
 
 # enable everything
-full = ["rt"]
+full = ["rt", "sync"]
+
+sync = []

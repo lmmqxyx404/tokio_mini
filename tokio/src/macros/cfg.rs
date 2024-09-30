@@ -7,3 +7,19 @@ macro_rules! cfg_rt {
       )*
   }
 }
+
+macro_rules! cfg_sync {
+  ($($item:item)*) => {
+      $(
+          #[cfg(feature = "sync")]
+          #[cfg_attr(docsrs, doc(cfg(feature = "sync")))]
+          $item
+      )*
+  }
+}
+
+macro_rules! cfg_not_sync {
+  ($($item:item)*) => {
+      $( #[cfg(not(feature = "sync"))] $item )*
+  }
+}
