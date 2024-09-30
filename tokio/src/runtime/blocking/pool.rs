@@ -1,5 +1,5 @@
-use crate::runtime::task::{JoinHandle};
-use crate::runtime::{Handle};
+use crate::runtime::task::JoinHandle;
+use crate::runtime::Handle;
 
 /// Runs the provided function on an executor dedicated to blocking operations.
 /// Tasks will be scheduled as non-mandatory, meaning they may not get executed
@@ -11,9 +11,9 @@ where
     F: FnOnce() -> R + Send + 'static,
     R: Send + 'static,
 {
-    todo!()
     // todo:1 handle is the start then is relative fn.
-    // let rt = Handle::current();
-    
+    let rt = Handle::current();
+    todo!()
+
     // rt.spawn_blocking(func)
 }

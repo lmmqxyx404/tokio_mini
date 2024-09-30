@@ -12,4 +12,8 @@ rust-version = "1.63"
 
 [features]
 # Include nothing by default
-default = []
+default = ["rt"]
+rt = []
+
+# enable everything
+full = ["rt"]
