@@ -1,6 +1,6 @@
 use crate::runtime::{context, scheduler};
 
-use std::marker::PhantomData;
+use std::{fmt, marker::PhantomData};
 
 /// Handle to the runtime.
 ///
@@ -82,5 +82,24 @@ impl Handle {
         }
     }
 
+    /// 2 TODO: add the doc
+    #[track_caller]
+    pub fn current() -> Self {
+        Handle {
+            inner: scheduler::Handle::current(),
+        }
+    }
     // todo: add more fn.
+}
+
+/// Error returned by `try_current` when no Runtime has been started
+#[derive(Debug)]
+pub struct TryCurrentError {
+    // kind: TryCurrentErrorKind,
+}
+
+impl fmt::Display for TryCurrentError {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        todo!()
+    }
 }

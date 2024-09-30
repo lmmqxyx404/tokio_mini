@@ -1,3 +1,4 @@
+use crate::runtime::handle::TryCurrentError;
 use crate::runtime::scheduler;
 use crate::util::markers::SyncNotSend;
 
@@ -22,4 +23,11 @@ pub(crate) struct SetCurrentGuard {
 pub(crate) fn try_set_current(handle: &scheduler::Handle) -> Option<SetCurrentGuard> {
     todo!()
     // CONTEXT.try_with(|ctx| ctx.set_current(handle)).ok()
+}
+
+pub(crate) fn with_current<F, R>(f: F) -> Result<R, TryCurrentError>
+where
+    F: FnOnce(&scheduler::Handle) -> R,
+{
+    todo!()
 }
