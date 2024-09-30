@@ -1,6 +1,7 @@
 use crate::loom::sync::Arc;
 use crate::runtime::task::JoinHandle;
-use crate::runtime::Handle;
+use crate::runtime::{Builder, Handle};
+use crate::runtime::blocking::{shutdown};
 
 /// Runs the provided function on an executor dedicated to blocking operations.
 /// Tasks will be scheduled as non-mandatory, meaning they may not get executed
@@ -36,3 +37,15 @@ impl Spawner {
 }
 
 struct Inner {}
+
+pub(crate) struct BlockingPool {}
+
+// ===== impl BlockingPool =====
+
+impl BlockingPool {
+    pub(crate) fn new(builder: &Builder, thread_cap: usize) -> BlockingPool {
+        let (shutdown_tx, shutdown_rx) = shutdown::channel();
+
+        todo!()
+    }
+}
