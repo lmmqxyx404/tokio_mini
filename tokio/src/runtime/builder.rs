@@ -10,6 +10,9 @@ pub struct Builder {
     max_blocking_threads: usize,
     /// Customizable keep alive timeout for `BlockingPool`
     pub(super) keep_alive: Option<Duration>,
+    /// Whether or not to enable the I/O driver
+    enable_io: bool,
+    nevents: usize,
 }
 
 impl Builder {
@@ -41,6 +44,10 @@ impl Builder {
             max_blocking_threads: 512,
 
             keep_alive: None,
+
+            // I/O defaults to "off"
+            enable_io: false,
+            nevents: 1024,
         }
     }
 
@@ -60,7 +67,10 @@ impl Builder {
     }
 
     fn get_cfg(&self, workers: usize) -> driver::Cfg {
-        todo!() // driver::Cfg {}
+        driver::Cfg {
+            enable_io: self.enable_io,
+            nevents: self.nevents,
+        }
     }
 }
 

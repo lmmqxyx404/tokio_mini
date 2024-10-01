@@ -1,5 +1,7 @@
 use std::io;
 
+use crate::runtime::park::{ParkThread, UnparkThread};
+
 #[derive(Debug)]
 pub(crate) struct Driver {}
 
@@ -15,6 +17,8 @@ impl Driver {
     pub(crate) fn new(cfg: Cfg) -> io::Result<(Self, Handle)> {
         let (io_stack, io_handle, signal_handle) = create_io_stack(cfg.enable_io, cfg.nevents)?;
 
+        // let clock = create_clock(cfg.enable_pause_time, cfg.start_paused);
+
         todo!()
     }
 }
@@ -23,14 +27,33 @@ impl Driver {
 
 cfg_io_driver! {
   #[derive(Debug)]
-  pub(crate) enum IoStack {}
+  pub(crate) enum IoStack {
+    Disabled(ParkThread),
+
+  }
 
   #[derive(Debug)]
-  pub(crate) enum IoHandle {}
+  pub(crate) enum IoHandle {
+    Disabled(UnparkThread),
+
+  }
+
 
   fn create_io_stack(enabled: bool, nevents: usize) -> io::Result<(IoStack, IoHandle, SignalHandle)> {
-    todo!()
-  }
+    #[cfg(loom)]
+    assert!(!enabled);
+
+    let ret = if enabled {
+       todo!()
+    } else {
+        let park_thread = ParkThread::new();
+        let unpark_thread = park_thread.unpark();
+        (IoStack::Disabled(park_thread), IoHandle::Disabled(unpark_thread), Default::default())
+    };
+
+    Ok(ret)
+}
+
 }
 
 // ===== signal driver =====
