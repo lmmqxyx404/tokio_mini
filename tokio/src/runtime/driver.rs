@@ -9,10 +9,15 @@ pub(crate) struct Driver {}
 pub(crate) struct Handle {}
 
 pub(crate) struct Cfg {
+    /// following 2 used for `create_io_stack`
     pub(crate) enable_io: bool,
     pub(crate) nevents: usize,
+    /// following 2 used for `create_clock`
     pub(crate) enable_pause_time: bool,
     pub(crate) start_paused: bool,
+    /// following 2 used for `create_time_driver`
+    pub(crate) enable_time: bool,
+    pub(crate) workers: usize,
 }
 
 impl Driver {
@@ -21,6 +26,8 @@ impl Driver {
 
         let clock = create_clock(cfg.enable_pause_time, cfg.start_paused);
 
+        let (time_driver, time_handle) =
+            create_time_driver(cfg.enable_time, io_stack, &clock, cfg.workers);
         todo!()
     }
 }
@@ -65,11 +72,28 @@ cfg_signal_internal_and_unix! {
 }
 
 // ===== time driver =====
-
 cfg_time! {
-  pub(crate) type Clock = crate::time::Clock;
+    #[derive(Debug)]
+    pub(crate) enum TimeDriver {}
 
-  fn create_clock(enable_pausing: bool, start_paused: bool) -> Clock {
-    crate::time::Clock::new(enable_pausing, start_paused)
-  }
+    pub(crate) type Clock = crate::time::Clock;
+    pub(crate) type TimeHandle = Option<crate::runtime::time::Handle>;
+
+    fn create_clock(enable_pausing: bool, start_paused: bool) -> Clock {
+        crate::time::Clock::new(enable_pausing, start_paused)
+    }
+
+    fn create_time_driver(
+        enable: bool,
+        io_stack: IoStack,
+        clock: &Clock,
+        workers: usize,
+    ) -> (TimeDriver, TimeHandle) {
+        if enable {
+          todo!()
+        }else {
+          todo!()
+        }
+        
+    }
 }

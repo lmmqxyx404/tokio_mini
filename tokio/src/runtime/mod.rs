@@ -27,3 +27,7 @@ cfg_signal_internal_and_unix! {
 }
 
 pub(crate) mod park;
+
+cfg_time! {
+    pub(crate) mod time;
+}

@@ -15,6 +15,8 @@ pub struct Builder {
     nevents: usize,
     /// Whether or not the clock should start paused.
     start_paused: bool,
+    /// Whether or not to enable the time driver
+    enable_time: bool,
 }
 
 impl Builder {
@@ -52,6 +54,9 @@ impl Builder {
             nevents: 1024,
             // The clock starts not-paused
             start_paused: false,
+
+            // Time defaults to "off"
+            enable_time: false,
         }
     }
 
@@ -78,6 +83,8 @@ impl Builder {
                 Kind::CurrentThread => true,
             },
             start_paused: self.start_paused,
+            enable_time: self.enable_time,
+            workers,
         }
     }
 }
