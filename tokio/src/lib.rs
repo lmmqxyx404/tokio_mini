@@ -22,3 +22,7 @@ cfg_sync! {
 cfg_not_sync! {
   mod sync;
 }
+
+cfg_time! {
+  pub mod time;
+}

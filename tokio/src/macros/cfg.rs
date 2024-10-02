@@ -58,3 +58,29 @@ macro_rules! cfg_signal_internal_and_unix {
       cfg_signal_internal! { $($item)* }
   }
 }
+
+macro_rules! cfg_time {
+  ($($item:item)*) => {
+      $(
+          #[cfg(feature = "time")]
+          #[cfg_attr(docsrs, doc(cfg(feature = "time")))]
+          $item
+      )*
+  }
+}
+
+macro_rules! cfg_test_util {
+  ($($item:item)*) => {
+      $(
+          #[cfg(feature = "test-util")]
+          #[cfg_attr(docsrs, doc(cfg(feature = "test-util")))]
+          $item
+      )*
+  }
+}
+
+macro_rules! cfg_not_test_util {
+  ($($item:item)*) => {
+      $( #[cfg(not(feature = "test-util"))] $item )*
+  }
+}

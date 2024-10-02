@@ -15,7 +15,7 @@ rust-version = "1.63"
 default = ["full"]
 rt = []
 
-full = ["rt", "sync", "net", "process", "signal"]
+full = ["rt", "sync", "net", "process", "signal", "time", "test-util"]
 
 # enable everything
 sync = []
@@ -25,3 +25,7 @@ net = []
 process = []
 
 signal = []
+
+time = []
+
+test-util = ["rt", "sync", "time"]
