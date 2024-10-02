@@ -13,6 +13,8 @@ pub struct Builder {
     /// Whether or not to enable the I/O driver
     enable_io: bool,
     nevents: usize,
+    /// Whether or not the clock should start paused.
+    start_paused: bool,
 }
 
 impl Builder {
@@ -48,6 +50,8 @@ impl Builder {
             // I/O defaults to "off"
             enable_io: false,
             nevents: 1024,
+            // The clock starts not-paused
+            start_paused: false,
         }
     }
 
@@ -70,6 +74,10 @@ impl Builder {
         driver::Cfg {
             enable_io: self.enable_io,
             nevents: self.nevents,
+            enable_pause_time: match self.kind {
+                Kind::CurrentThread => true,
+            },
+            start_paused: self.start_paused,
         }
     }
 }
