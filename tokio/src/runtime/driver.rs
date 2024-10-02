@@ -28,7 +28,8 @@ impl Driver {
 
         let (time_driver, time_handle) =
             create_time_driver(cfg.enable_time, io_stack, &clock, cfg.workers);
-        todo!()
+
+        Ok((Self {}, Handle {}))
     }
 }
 
@@ -74,7 +75,9 @@ cfg_signal_internal_and_unix! {
 // ===== time driver =====
 cfg_time! {
     #[derive(Debug)]
-    pub(crate) enum TimeDriver {}
+    pub(crate) enum TimeDriver {
+      Disabled(IoStack),
+    }
 
     pub(crate) type Clock = crate::time::Clock;
     pub(crate) type TimeHandle = Option<crate::runtime::time::Handle>;
@@ -92,8 +95,8 @@ cfg_time! {
         if enable {
           todo!()
         }else {
-          todo!()
+          (TimeDriver::Disabled(io_stack), None)
         }
-        
+
     }
 }
