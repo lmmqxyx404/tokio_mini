@@ -70,7 +70,8 @@ impl Builder {
         let (driver, driver_handle) = driver::Driver::new(self.get_cfg(1))?;
 
         // Blocking pool
-        // let blocking_pool = blocking::create_blocking_pool(self, self.max_blocking_threads);
+        let blocking_pool = blocking::create_blocking_pool(self, self.max_blocking_threads);
+        let blocking_spawner = blocking_pool.spawner().clone();
 
         todo!()
     }

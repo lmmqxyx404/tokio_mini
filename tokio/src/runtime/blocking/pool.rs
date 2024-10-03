@@ -40,7 +40,9 @@ impl Spawner {
 
 struct Inner {}
 
-pub(crate) struct BlockingPool {}
+pub(crate) struct BlockingPool {
+    spawner: Spawner,
+}
 
 // ===== impl BlockingPool =====
 
@@ -49,7 +51,15 @@ impl BlockingPool {
         let (shutdown_tx, shutdown_rx) = shutdown::channel();
         let keep_alive = builder.keep_alive.unwrap_or(KEEP_ALIVE);
 
-        BlockingPool {}
+        BlockingPool {
+            spawner: Spawner {
+                inner: Arc::new(Inner {}),
+            },
+        }
+    }
+
+    pub(crate) fn spawner(&self) -> &Spawner {
+        &self.spawner
     }
 }
 
