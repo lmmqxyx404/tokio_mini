@@ -2,7 +2,7 @@ use crate::loom::sync::Arc;
 use crate::runtime::driver::{self, Driver};
 use crate::runtime::{blocking, Config, WorkerMetrics};
 use crate::util::rand::RngSeedGenerator;
-use std::fmt;
+use std::{fmt, thread};
 
 /// Handle to the current thread scheduler
 pub(crate) struct Handle {}
@@ -25,6 +25,7 @@ impl CurrentThread {
         config: Config,
     ) -> (CurrentThread, Arc<Handle>) {
         let worker_metrics = WorkerMetrics::from_config(&config);
+        worker_metrics.set_thread_id(thread::current().id());
 
         todo!()
     }
