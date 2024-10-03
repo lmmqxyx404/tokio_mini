@@ -34,3 +34,7 @@ in runtime::blocking::poll
 ## 8.EnterGuard
 
 ## 9.SyncNotSend
+
+## code skills
+### `use std::hash::{BuildHasher, Hash, Hasher};`
+The above traits are all useful

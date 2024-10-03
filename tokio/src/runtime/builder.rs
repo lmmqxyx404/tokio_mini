@@ -1,7 +1,10 @@
 use std::io;
 use std::time::Duration;
 
-use crate::runtime::{blocking, driver, Runtime};
+use crate::{
+    runtime::{blocking, driver, Runtime},
+    util::rand::{RngSeed, RngSeedGenerator},
+};
 
 pub struct Builder {
     /// Runtime type
@@ -17,6 +20,8 @@ pub struct Builder {
     start_paused: bool,
     /// Whether or not to enable the time driver
     enable_time: bool,
+    /// Specify a random number generator seed to provide deterministic results
+    pub(super) seed_generator: RngSeedGenerator,
 }
 
 impl Builder {
@@ -57,6 +62,8 @@ impl Builder {
 
             // Time defaults to "off"
             enable_time: false,
+
+            seed_generator: RngSeedGenerator::new(RngSeed::new()),
         }
     }
 
@@ -72,6 +79,10 @@ impl Builder {
         // Blocking pool
         let blocking_pool = blocking::create_blocking_pool(self, self.max_blocking_threads);
         let blocking_spawner = blocking_pool.spawner().clone();
+
+        // Generate a rng seed for this runtime.
+        let mut seed_generator_1 = self.seed_generator.next_generator();
+        let mut seed_generator_2 = self.seed_generator.next_generator();
 
         todo!()
     }
