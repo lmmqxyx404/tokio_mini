@@ -16,6 +16,11 @@ impl fmt::Debug for Handle {
 /// Executes tasks on the current thread
 pub(crate) struct CurrentThread {}
 
+/// Used if none is specified. This is a temporary constant and will be removed
+/// as we unify tuning logic between the multi-thread and current-thread
+/// schedulers.
+const DEFAULT_GLOBAL_QUEUE_INTERVAL: u32 = 31;
+
 impl CurrentThread {
     pub(crate) fn new(
         driver: Driver,
@@ -27,6 +32,10 @@ impl CurrentThread {
         let worker_metrics = WorkerMetrics::from_config(&config);
         worker_metrics.set_thread_id(thread::current().id());
 
+        // Get the configured global queue interval, or use the default.
+        let global_queue_interval = config
+            .global_queue_interval
+            .unwrap_or(DEFAULT_GLOBAL_QUEUE_INTERVAL);
         todo!()
     }
 }

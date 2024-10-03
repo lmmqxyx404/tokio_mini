@@ -28,6 +28,14 @@ pub struct Builder {
     pub(super) seed_generator: RngSeedGenerator,
     /// When true, enables task poll count histogram instrumentation.
     pub(super) metrics_poll_count_histogram_enable: bool,
+    /// How many ticks before pulling a task from the global/remote queue?
+    ///
+    /// When `None`, the value is unspecified and behavior details are left to
+    /// the scheduler. Each scheduler flavor could choose to either pick its own
+    /// default value or use some other strategy to decide when to poll from the
+    /// global queue. For example, the multi-threaded scheduler uses a
+    /// self-tuning strategy based on mean task poll times.
+    pub(super) global_queue_interval: Option<u32>,
 }
 
 impl Builder {
@@ -72,6 +80,10 @@ impl Builder {
             seed_generator: RngSeedGenerator::new(RngSeed::new()),
 
             metrics_poll_count_histogram_enable: false,
+
+            // Defaults for these values depend on the scheduler kind, so we get them
+            // as parameters.
+            global_queue_interval: None,
         }
     }
 
@@ -99,6 +111,7 @@ impl Builder {
             seed_generator_2,
             Config {
                 metrics_poll_count_histogram: self.metrics_poll_count_histogram_builder(),
+                global_queue_interval: self.global_queue_interval,
             },
         );
         todo!()
@@ -119,7 +132,7 @@ impl Builder {
 
     fn metrics_poll_count_histogram_builder(&self) -> Option<HistogramBuilder> {
         if self.metrics_poll_count_histogram_enable {
-            todo!()// Some(self.metrics_poll_count_histogram.clone())
+            todo!() // Some(self.metrics_poll_count_histogram.clone())
         } else {
             None
         }
