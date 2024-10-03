@@ -8,6 +8,8 @@ use crate::{
     util::rand::{RngSeed, RngSeedGenerator},
 };
 
+use super::HistogramBuilder;
+
 pub struct Builder {
     /// Runtime type
     kind: Kind,
@@ -24,6 +26,8 @@ pub struct Builder {
     enable_time: bool,
     /// Specify a random number generator seed to provide deterministic results
     pub(super) seed_generator: RngSeedGenerator,
+    /// When true, enables task poll count histogram instrumentation.
+    pub(super) metrics_poll_count_histogram_enable: bool,
 }
 
 impl Builder {
@@ -66,6 +70,8 @@ impl Builder {
             enable_time: false,
 
             seed_generator: RngSeedGenerator::new(RngSeed::new()),
+
+            metrics_poll_count_histogram_enable: false,
         }
     }
 
@@ -91,7 +97,9 @@ impl Builder {
             driver_handle,
             blocking_spawner,
             seed_generator_2,
-            Config {},
+            Config {
+                metrics_poll_count_histogram: self.metrics_poll_count_histogram_builder(),
+            },
         );
         todo!()
     }
@@ -106,6 +114,14 @@ impl Builder {
             start_paused: self.start_paused,
             enable_time: self.enable_time,
             workers,
+        }
+    }
+
+    fn metrics_poll_count_histogram_builder(&self) -> Option<HistogramBuilder> {
+        if self.metrics_poll_count_histogram_enable {
+            todo!()// Some(self.metrics_poll_count_histogram.clone())
+        } else {
+            None
         }
     }
 }

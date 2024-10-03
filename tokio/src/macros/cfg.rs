@@ -84,3 +84,12 @@ macro_rules! cfg_not_test_util {
       $( #[cfg(not(feature = "test-util"))] $item )*
   }
 }
+
+macro_rules! cfg_not_unstable_metrics {
+  ($($item:item)*) => {
+      $(
+          #[cfg(not(tokio_unstable))]
+          $item
+      )*
+  }
+}

@@ -21,6 +21,11 @@ cfg_rt! {
 
     mod config;
     use config::Config;
+
+    pub(crate) mod metrics;
+    // pub use metrics::RuntimeMetrics;
+    pub(crate) use metrics::{ WorkerMetrics,HistogramBuilder};
+
 }
 
 mod driver;
