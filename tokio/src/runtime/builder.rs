@@ -2,7 +2,9 @@ use std::io;
 use std::time::Duration;
 
 use crate::{
-    runtime::{blocking, driver, Runtime},
+    runtime::{
+        blocking, config::Config, driver, scheduler::current_thread::CurrentThread, Runtime,
+    },
     util::rand::{RngSeed, RngSeedGenerator},
 };
 
@@ -81,9 +83,16 @@ impl Builder {
         let blocking_spawner = blocking_pool.spawner().clone();
 
         // Generate a rng seed for this runtime.
-        let mut seed_generator_1 = self.seed_generator.next_generator();
-        let mut seed_generator_2 = self.seed_generator.next_generator();
+        let seed_generator_1 = self.seed_generator.next_generator();
+        let seed_generator_2 = self.seed_generator.next_generator();
 
+        let (scheduler, handle) = CurrentThread::new(
+            driver,
+            driver_handle,
+            blocking_spawner,
+            seed_generator_2,
+            Config {},
+        );
         todo!()
     }
 

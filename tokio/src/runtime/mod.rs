@@ -18,6 +18,9 @@ cfg_rt! {
 
     mod runtime;
     pub use runtime::{Runtime};
+
+    mod config;
+    use config::Config;
 }
 
 mod driver;
