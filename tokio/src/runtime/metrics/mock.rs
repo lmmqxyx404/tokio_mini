@@ -1,3 +1,5 @@
+use std::thread::ThreadId;
+
 pub(crate) struct WorkerMetrics {}
 
 impl WorkerMetrics {
@@ -10,6 +12,8 @@ impl WorkerMetrics {
         let _ = &config.metrics_poll_count_histogram;
         Self::new()
     }
+    pub(crate) fn set_thread_id(&self, _thread_id: ThreadId) {}
+
 }
 
 #[derive(Clone, Default)]
