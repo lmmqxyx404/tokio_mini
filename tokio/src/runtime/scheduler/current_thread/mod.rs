@@ -4,6 +4,8 @@ use crate::runtime::{blocking, Config, WorkerMetrics};
 use crate::util::rand::RngSeedGenerator;
 use std::{fmt, thread};
 
+use crate::util::atomic_cell::AtomicCell;
+
 /// Handle to the current thread scheduler
 pub(crate) struct Handle {}
 
@@ -36,6 +38,14 @@ impl CurrentThread {
         let global_queue_interval = config
             .global_queue_interval
             .unwrap_or(DEFAULT_GLOBAL_QUEUE_INTERVAL);
+
+        let handle = Arc::new(Handle {});
+
+        let core = AtomicCell::new(Some(Box::new(Core {})));
         todo!()
     }
 }
+
+/// Data required for executing the scheduler. The struct is passed around to
+/// a function that will perform the scheduling work and acts as a capability token.
+struct Core {}
