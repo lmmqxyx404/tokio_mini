@@ -1,6 +1,6 @@
 use crate::loom::sync::Arc;
 use crate::runtime::driver::{self, Driver};
-use crate::runtime::{blocking, Config};
+use crate::runtime::{blocking, Config, WorkerMetrics};
 use crate::util::rand::RngSeedGenerator;
 use std::fmt;
 
@@ -24,6 +24,8 @@ impl CurrentThread {
         seed_generator: RngSeedGenerator,
         config: Config,
     ) -> (CurrentThread, Arc<Handle>) {
+        let worker_metrics = WorkerMetrics::from_config(&config);
+
         todo!()
     }
 }
