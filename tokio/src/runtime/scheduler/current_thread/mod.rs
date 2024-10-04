@@ -52,6 +52,12 @@ impl CurrentThread {
     }
 }
 
+impl fmt::Debug for CurrentThread {
+    fn fmt(&self, fmt: &mut fmt::Formatter<'_>) -> fmt::Result {
+        fmt.debug_struct("CurrentThread").finish()
+    }
+}
+
 /// Data required for executing the scheduler. The struct is passed around to
 /// a function that will perform the scheduling work and acts as a capability token.
 struct Core {}
