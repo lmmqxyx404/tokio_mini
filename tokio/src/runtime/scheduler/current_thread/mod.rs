@@ -42,7 +42,13 @@ impl CurrentThread {
         let handle = Arc::new(Handle {});
 
         let core = AtomicCell::new(Some(Box::new(Core {})));
-        todo!()
+
+        let scheduler = CurrentThread {
+            /* core,
+            notify: Notify::new(), */
+        };
+
+        (scheduler, handle)
     }
 }
 
