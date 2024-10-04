@@ -1,6 +1,6 @@
 cfg_rt! {
     pub(crate) mod current_thread;
-    // pub(crate) use current_thread::CurrentThread;
+    pub(crate) use current_thread::CurrentThread;
 }
 
 use std::sync::Arc;

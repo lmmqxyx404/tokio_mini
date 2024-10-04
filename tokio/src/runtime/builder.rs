@@ -10,6 +10,8 @@ use crate::{
 
 use super::HistogramBuilder;
 
+use crate::runtime::handle::Handle;
+
 pub struct Builder {
     /// Runtime type
     kind: Kind,
@@ -94,6 +96,9 @@ impl Builder {
     }
 
     fn build_current_thread_runtime(&mut self) -> io::Result<Runtime> {
+        use crate::runtime::runtime::Scheduler;
+        use crate::runtime::scheduler::{self};
+
         let (driver, driver_handle) = driver::Driver::new(self.get_cfg(1))?;
 
         // Blocking pool
@@ -114,7 +119,16 @@ impl Builder {
                 global_queue_interval: self.global_queue_interval,
             },
         );
-        todo!()
+
+        let handle = Handle {
+            inner: scheduler::Handle::CurrentThread(handle),
+        };
+
+        Ok(Runtime::from_parts(
+            Scheduler::CurrentThread(scheduler),
+            handle,
+            blocking_pool,
+        ))
     }
 
     fn get_cfg(&self, workers: usize) -> driver::Cfg {
