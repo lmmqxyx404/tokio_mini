@@ -4,10 +4,14 @@ use crate::runtime::blocking::BlockingPool;
 use crate::runtime::scheduler::CurrentThread;
 use crate::runtime::Handle;
 
+use super::handle::EnterGuard;
 use super::BOX_FUTURE_THRESHOLD;
 
 #[derive(Debug)]
-pub struct Runtime {}
+pub struct Runtime {
+    /// Handle to runtime, also contains driver handles
+    handle: Handle,
+}
 
 impl Runtime {
     #[track_caller]
@@ -16,7 +20,7 @@ impl Runtime {
             todo!()
         } else {
             println!("START BLOCK ON ELSE BRANCH");
-            todo!()
+            self.block_on_inner(future)
         }
     }
 
@@ -26,10 +30,20 @@ impl Runtime {
         blocking_pool: BlockingPool,
     ) -> Runtime {
         Runtime {
-            /*  scheduler,
             handle,
+            /*  scheduler,
             blocking_pool, */
         }
+    }
+
+    #[track_caller]
+    fn block_on_inner<F: Future>(&self, future: F) -> F::Output {
+        let _enter = self.enter();
+        todo!()
+    }
+
+    pub fn enter(&self) -> EnterGuard<'_> {
+        self.handle.enter()
     }
 }
 
