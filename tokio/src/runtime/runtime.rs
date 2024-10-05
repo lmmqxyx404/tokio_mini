@@ -4,13 +4,20 @@ use crate::runtime::blocking::BlockingPool;
 use crate::runtime::scheduler::CurrentThread;
 use crate::runtime::Handle;
 
+use super::BOX_FUTURE_THRESHOLD;
+
 #[derive(Debug)]
 pub struct Runtime {}
 
 impl Runtime {
     #[track_caller]
     pub fn block_on<F: Future>(&self, future: F) -> F::Output {
-        todo!()
+        if std::mem::size_of::<F>() > BOX_FUTURE_THRESHOLD {
+            todo!()
+        } else {
+            println!("START BLOCK ON ELSE BRANCH");
+            todo!()
+        }
     }
 
     pub(super) fn from_parts(
