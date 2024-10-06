@@ -4,6 +4,8 @@ use crate::util::markers::SyncNotSend;
 
 use std::marker::PhantomData;
 
+use super::CONTEXT;
+
 #[derive(Debug)]
 #[must_use]
 pub(crate) struct SetCurrentGuard {
@@ -21,8 +23,7 @@ pub(crate) struct SetCurrentGuard {
 ///
 /// [`Handle`]: crate::runtime::scheduler::Handle
 pub(crate) fn try_set_current(handle: &scheduler::Handle) -> Option<SetCurrentGuard> {
-    todo!()
-    // CONTEXT.try_with(|ctx| ctx.set_current(handle)).ok()
+    CONTEXT.try_with(|ctx| ctx.set_current(handle)).ok()
 }
 
 pub(crate) fn with_current<F, R>(f: F) -> Result<R, TryCurrentError>
