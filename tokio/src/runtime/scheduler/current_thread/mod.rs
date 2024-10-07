@@ -60,7 +60,10 @@ impl CurrentThread {
 
         pin!(future);
 
-        todo!()
+        crate::runtime::context::enter_runtime(handle, false, |blocking| {
+            println!("ss");
+            todo!()
+        })
     }
 }
 
