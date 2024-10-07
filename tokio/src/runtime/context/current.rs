@@ -4,7 +4,9 @@ use crate::util::markers::SyncNotSend;
 
 use std::marker::PhantomData;
 
-use super::CONTEXT;
+use super::{Context, CONTEXT};
+
+use std::cell::{Cell, RefCell};
 
 #[derive(Debug)]
 #[must_use]
@@ -31,4 +33,28 @@ where
     F: FnOnce(&scheduler::Handle) -> R,
 {
     todo!()
+}
+
+pub(super) struct HandleCell {
+    /// Current handle
+    handle: RefCell<Option<scheduler::Handle>>,
+    /* /// Tracks the number of nested calls to `try_set_current`.
+    depth: Cell<usize>, */
+}
+
+impl HandleCell {
+    pub(super) const fn new() -> HandleCell {
+        HandleCell {
+            handle: RefCell::new(None),
+            /* depth: Cell::new(0), */
+        }
+    }
+}
+
+impl Context {
+    pub(super) fn set_current(&self, handle: &scheduler::Handle) -> SetCurrentGuard {
+        let old_handle = self.current.handle.borrow_mut().replace(handle.clone());
+
+        todo!()
+    }
 }
