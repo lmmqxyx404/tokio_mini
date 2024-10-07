@@ -1,8 +1,15 @@
 use crate::runtime::scheduler;
 
 cfg_rt! {
-  mod current;
-  pub(crate) use current::{try_set_current, with_current, SetCurrentGuard};
+
+mod current;
+pub(crate) use current::{try_set_current, with_current, SetCurrentGuard};
+
+mod runtime;
+pub(crate) use runtime::enter_runtime;
+
+mod blocking;
+pub(crate) use blocking::BlockingRegionGuard;
 }
 
 struct Context {
@@ -19,4 +26,3 @@ tokio_thread_local! {
             current: current::HandleCell::new(),
     } }
 }
-
