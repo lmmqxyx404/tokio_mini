@@ -38,15 +38,15 @@ where
 pub(super) struct HandleCell {
     /// Current handle
     handle: RefCell<Option<scheduler::Handle>>,
-    /* /// Tracks the number of nested calls to `try_set_current`.
-    depth: Cell<usize>, */
+    /// Tracks the number of nested calls to `try_set_current`.
+    depth: Cell<usize>,
 }
 
 impl HandleCell {
     pub(super) const fn new() -> HandleCell {
         HandleCell {
             handle: RefCell::new(None),
-            /* depth: Cell::new(0), */
+            depth: Cell::new(0),
         }
     }
 }
@@ -54,7 +54,17 @@ impl HandleCell {
 impl Context {
     pub(super) fn set_current(&self, handle: &scheduler::Handle) -> SetCurrentGuard {
         let old_handle = self.current.handle.borrow_mut().replace(handle.clone());
+        let depth = self.current.depth.get();
 
-        todo!()
+        assert!(depth != usize::MAX, "reached max `enter` depth");
+
+        let depth = depth + 1;
+        self.current.depth.set(depth);
+
+        SetCurrentGuard {
+            prev: old_handle,
+            depth,
+            _p: PhantomData,
+        }
     }
 }
