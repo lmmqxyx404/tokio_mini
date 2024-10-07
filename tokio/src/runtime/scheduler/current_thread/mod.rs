@@ -57,6 +57,9 @@ impl CurrentThread {
     #[track_caller]
     pub(crate) fn block_on<F: Future>(&self, handle: &scheduler::Handle, future: F) -> F::Output {
         println!("BLOCK ON");
+
+        pin!(future);
+
         todo!()
     }
 }
