@@ -2,9 +2,12 @@ use crate::loom::sync::Arc;
 use crate::runtime::driver::{self, Driver};
 use crate::runtime::{blocking, Config, WorkerMetrics};
 use crate::util::rand::RngSeedGenerator;
+use std::future::Future;
 use std::{fmt, thread};
 
 use crate::util::atomic_cell::AtomicCell;
+
+use crate::runtime::scheduler::{self};
 
 /// Handle to the current thread scheduler
 pub(crate) struct Handle {}
@@ -49,6 +52,12 @@ impl CurrentThread {
         };
 
         (scheduler, handle)
+    }
+
+    #[track_caller]
+    pub(crate) fn block_on<F: Future>(&self, handle: &scheduler::Handle, future: F) -> F::Output {
+        println!("BLOCK ON");
+        todo!()
     }
 }
 
