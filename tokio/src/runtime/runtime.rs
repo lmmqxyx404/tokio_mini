@@ -11,6 +11,8 @@ use super::BOX_FUTURE_THRESHOLD;
 pub struct Runtime {
     /// Handle to runtime, also contains driver handles
     handle: Handle,
+    /// Task scheduler
+    scheduler: Scheduler,
 }
 
 impl Runtime {
@@ -31,7 +33,8 @@ impl Runtime {
     ) -> Runtime {
         Runtime {
             handle,
-            /*  scheduler,
+            scheduler,
+            /*
             blocking_pool, */
         }
     }
@@ -39,7 +42,10 @@ impl Runtime {
     #[track_caller]
     fn block_on_inner<F: Future>(&self, future: F) -> F::Output {
         let _enter = self.enter();
-        todo!()
+
+        match &self.scheduler {
+            Scheduler::CurrentThread(exec) => exec.block_on(&self.handle.inner, future),
+        }
     }
 
     pub fn enter(&self) -> EnterGuard<'_> {
