@@ -13,8 +13,17 @@ impl WorkerMetrics {
         Self::new()
     }
     pub(crate) fn set_thread_id(&self, _thread_id: ThreadId) {}
-
 }
 
 #[derive(Clone, Default)]
 pub(crate) struct HistogramBuilder {}
+
+pub(crate) struct MetricsBatch {}
+
+impl MetricsBatch {
+    pub(crate) fn new(_: &WorkerMetrics) -> Self {
+        Self {}
+    }
+
+    pub(crate) fn start_processing_scheduled_tasks(&mut self) {}
+}
