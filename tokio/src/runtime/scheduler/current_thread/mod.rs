@@ -10,7 +10,10 @@ use crate::util::atomic_cell::AtomicCell;
 use crate::runtime::scheduler::{self};
 
 /// Handle to the current thread scheduler
-pub(crate) struct Handle {}
+pub(crate) struct Handle {
+    /// Current random number generator seed
+    pub(crate) seed_generator: RngSeedGenerator,
+}
 
 impl fmt::Debug for Handle {
     fn fmt(&self, fmt: &mut fmt::Formatter<'_>) -> fmt::Result {
@@ -42,7 +45,7 @@ impl CurrentThread {
             .global_queue_interval
             .unwrap_or(DEFAULT_GLOBAL_QUEUE_INTERVAL);
 
-        let handle = Arc::new(Handle {});
+        let handle = Arc::new(Handle { seed_generator });
 
         let core = AtomicCell::new(Some(Box::new(Core {})));
 

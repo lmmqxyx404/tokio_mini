@@ -18,12 +18,11 @@ where
                 allow_block_in_place,
             });
 
-            todo!()
-
-            /* // Generate a new seed
+            // Generate a new seed
             let rng_seed = handle.seed_generator().next_seed();
 
-            // Swap the RNG seed
+            todo!()
+            /* // Swap the RNG seed
             let mut rng = c.rng.get().unwrap_or_else(FastRand::new);
             let old_seed = rng.replace_seed(rng_seed);
             c.rng.set(Some(rng));

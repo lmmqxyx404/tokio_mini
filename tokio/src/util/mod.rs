@@ -7,6 +7,10 @@ pub(crate) mod markers;
 #[cfg(any(feature = "rt", feature = "time"))]
 pub(crate) mod rand;
 
-/// 4 
+/// 4
 #[cfg(feature = "rt")]
 pub(crate) mod atomic_cell;
+
+cfg_rt! {
+pub(crate) use self::rand::RngSeedGenerator;
+}

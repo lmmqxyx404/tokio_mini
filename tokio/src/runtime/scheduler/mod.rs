@@ -27,6 +27,7 @@ pub(crate) enum Handle {
 cfg_rt! {
     use crate::runtime::context;
     use crate::runtime::{blocking};
+    use crate::util::RngSeedGenerator;
 
     macro_rules! match_flavor {
         ($self:expr, $ty:ident($h:ident) => $e:expr) => {
@@ -53,6 +54,10 @@ cfg_rt! {
 
         pub(crate) fn blocking_spawner(&self) -> &blocking::Spawner {
             todo!() // match_flavor!(self, Handle(h) => &h.blocking_spawner)
+        }
+
+        pub(crate) fn seed_generator(&self) -> &RngSeedGenerator {
+            match_flavor!(self, Handle(h) => &h.seed_generator)
         }
     }
 }
