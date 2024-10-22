@@ -15,6 +15,11 @@ pub(crate) use runtime::enter_runtime;
 
 mod blocking;
 pub(crate) use blocking::BlockingRegionGuard;
+
+use crate::runtime::{scheduler};
+
+mod scoped;
+use scoped::Scoped;
 }
 
 struct Context {
@@ -31,6 +36,10 @@ struct Context {
     runtime: Cell<EnterRuntime>,
     #[cfg(any(feature = "rt", feature = "macros", feature = "time"))]
     rng: Cell<Option<FastRand>>,
+
+    /// Handle to the scheduler's internal "context"
+    #[cfg(feature = "rt")]
+    scheduler: Scoped<scheduler::Context>,
 }
 
 tokio_thread_local! {
@@ -48,5 +57,15 @@ tokio_thread_local! {
             runtime: Cell::new(EnterRuntime::NotEntered),
             #[cfg(any(feature = "rt", feature = "macros", feature = "time"))]
             rng: Cell::new(None),
+
+            // Tracks the current scheduler internal context
+            #[cfg(feature = "rt")]
+            scheduler: Scoped::new(),
     } }
+}
+
+cfg_rt! {
+    pub(super) fn set_scheduler<R>(v: &scheduler::Context, f: impl FnOnce() -> R) -> R {
+        CONTEXT.with(|c| c.scheduler.set(v, f))
+    }
 }
