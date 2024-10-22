@@ -108,7 +108,13 @@ impl CurrentThread {
     fn take_core(&self, handle: &Arc<Handle>) -> Option<CoreGuard> {
         let core = self.core.take()?;
 
-        Some(CoreGuard {})
+        Some(CoreGuard {
+            context: scheduler::Context::CurrentThread(Context {
+                handle: handle.clone(),
+                /*  core: RefCell::new(Some(core)),
+                defer: Defer::new(), */
+            }),
+        })
     }
 }
 
@@ -126,7 +132,9 @@ struct Core {}
 
 /// Used to ensure we always place the `Core` value back into its slot in
 /// `CurrentThread`, even if the future panics.
-struct CoreGuard {}
+struct CoreGuard {
+    context: scheduler::Context,
+}
 
 impl CoreGuard {
     #[track_caller]
@@ -145,6 +153,8 @@ impl CoreGuard {
     where
         F: FnOnce(Box<Core>, &Context) -> (Box<Core>, R),
     {
+        let context = self.context.expect_current_thread();
+
         todo!()
     }
 }
