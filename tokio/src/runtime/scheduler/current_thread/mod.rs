@@ -2,7 +2,7 @@ use crate::loom::sync::Arc;
 use crate::runtime::driver::{self, Driver};
 use crate::runtime::{blocking, context, Config, WorkerMetrics};
 use crate::util::rand::RngSeedGenerator;
-use crate::util::WakerRef;
+use crate::util::{waker_ref, Wake, WakerRef};
 use std::cell::RefCell;
 use std::future::Future;
 use std::{fmt, thread};
@@ -10,6 +10,9 @@ use std::{fmt, thread};
 use crate::util::atomic_cell::AtomicCell;
 
 use crate::runtime::scheduler::{self};
+
+use crate::loom::sync::atomic::AtomicBool;
+use std::sync::atomic::Ordering::Release;
 
 /// Handle to the current thread scheduler
 pub(crate) struct Handle {
@@ -29,12 +32,23 @@ impl fmt::Debug for Handle {
 
 impl Handle {
     fn waker_ref(me: &Arc<Self>) -> WakerRef {
-        todo!()
-        /* // Set woken to true when enter block_on, ensure outer future
+        // Set woken to true when enter block_on, ensure outer future
         // be polled for the first time when enter loop
         me.shared.woken.store(true, Release);
-        waker_ref(me) */
+        waker_ref(me)
     }
+}
+
+impl Wake for Handle {
+    /* fn wake(arc_self: Arc<Self>) {
+        Wake::wake_by_ref(&arc_self);
+    }
+
+    /// Wake by reference
+    fn wake_by_ref(arc_self: &Arc<Self>) {
+        arc_self.shared.woken.store(true, Release);
+        arc_self.driver.unpark();
+    } */
 }
 
 /// Executes tasks on the current thread
@@ -66,7 +80,10 @@ impl CurrentThread {
 
         let handle = Arc::new(Handle {
             seed_generator,
-            shared: Shared { worker_metrics },
+            shared: Shared {
+                worker_metrics,
+                woken: AtomicBool::new(false),
+            },
         });
 
         let core = AtomicCell::new(Some(Box::new(Core {})));
@@ -168,6 +185,8 @@ impl CoreGuard {
 struct Shared {
     /// This scheduler only has one worker.
     worker_metrics: WorkerMetrics,
+    /// Indicates whether the blocked on thread was woken.
+    woken: AtomicBool,
 }
 
 /// Thread-local context.

@@ -16,4 +16,6 @@ cfg_rt! {
 
   mod wake;
   pub(crate) use wake::WakerRef;
+  pub(crate) use wake::{waker_ref, Wake};
+
 }
