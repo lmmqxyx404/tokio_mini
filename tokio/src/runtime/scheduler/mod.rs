@@ -68,4 +68,20 @@ cfg_rt! {
             }
         }
     }
+
+    impl Context {
+        #[track_caller]
+        pub(crate) fn expect_current_thread(&self) -> &current_thread::Context {
+            match self {
+                Context::CurrentThread(context) => context,
+                #[cfg(feature = "rt-multi-thread")]
+                _ => panic!("expected `CurrentThread::Context`")
+            }
+        }
+    }
+}
+
+#[cfg(feature = "rt")]
+pub(super) enum Context {
+    CurrentThread(current_thread::Context),
 }
