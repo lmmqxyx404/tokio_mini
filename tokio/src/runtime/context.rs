@@ -2,7 +2,8 @@ use std::cell::Cell;
 
 use runtime::EnterRuntime;
 
-use crate::runtime::scheduler;
+#[cfg(any(feature = "rt", feature = "macros", feature = "time"))]
+use crate::util::rand::FastRand;
 
 cfg_rt! {
 
@@ -21,14 +22,15 @@ struct Context {
     #[cfg(feature = "rt")]
     current: current::HandleCell,
 
-        /// Tracks if the current thread is currently driving a runtime.
+    /// Tracks if the current thread is currently driving a runtime.
     /// Note, that if this is set to "entered", the current scheduler
     /// handle may not reference the runtime currently executing. This
     /// is because other runtime handles may be set to current from
     /// within a runtime.
     #[cfg(feature = "rt")]
     runtime: Cell<EnterRuntime>,
-
+    #[cfg(any(feature = "rt", feature = "macros", feature = "time"))]
+    rng: Cell<Option<FastRand>>,
 }
 
 tokio_thread_local! {
@@ -44,6 +46,7 @@ tokio_thread_local! {
             // within a runtime.
             #[cfg(feature = "rt")]
             runtime: Cell::new(EnterRuntime::NotEntered),
-
+            #[cfg(any(feature = "rt", feature = "macros", feature = "time"))]
+            rng: Cell::new(None),
     } }
 }

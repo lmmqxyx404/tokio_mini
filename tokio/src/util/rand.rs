@@ -36,6 +36,10 @@ impl FastRand {
 
         s0.wrapping_add(s1)
     }
+    /// Initialize a new fast random number generator using the default source of entropy.
+    pub(crate) fn new() -> FastRand {
+        FastRand::from_seed(RngSeed::new())
+    }
 }
 
 /// A seed for random number generation.
