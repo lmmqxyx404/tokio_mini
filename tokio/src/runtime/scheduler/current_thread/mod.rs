@@ -64,7 +64,7 @@ impl CurrentThread {
         pin!(future);
 
         crate::runtime::context::enter_runtime(handle, false, |blocking| {
-            println!("ss");
+            println!("real enter_runtime code");
             todo!()
         })
     }

@@ -43,3 +43,20 @@ impl RngSeedGenerator {
         RngSeed::from_pair(s, r)
     }
 }
+
+
+impl FastRand {
+    /// Replaces the state of the random number generator with the provided seed, returning
+    /// the seed that represents the previous state of the random number generator.
+    ///
+    /// The random number generator will become equivalent to one created with
+    /// the same seed.
+    pub(crate) fn replace_seed(&mut self, seed: RngSeed) -> RngSeed {
+        let old_seed = RngSeed::from_pair(self.one, self.two);
+
+        self.one = seed.s;
+        self.two = seed.r;
+
+        old_seed
+    }
+}
