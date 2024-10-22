@@ -22,7 +22,10 @@ impl fmt::Debug for Handle {
 }
 
 /// Executes tasks on the current thread
-pub(crate) struct CurrentThread {}
+pub(crate) struct CurrentThread {
+    /// Core scheduler data is acquired by a thread entering `block_on`.
+    core: AtomicCell<Core>,
+}
 
 /// Used if none is specified. This is a temporary constant and will be removed
 /// as we unify tuning logic between the multi-thread and current-thread
@@ -50,7 +53,8 @@ impl CurrentThread {
         let core = AtomicCell::new(Some(Box::new(Core {})));
 
         let scheduler = CurrentThread {
-            /* core,
+            core,
+            /*
             notify: Notify::new(), */
         };
 
@@ -65,8 +69,24 @@ impl CurrentThread {
 
         crate::runtime::context::enter_runtime(handle, false, |blocking| {
             println!("real enter_runtime code");
-            todo!()
+            let handle = handle.as_current_thread();
+            // Attempt to steal the scheduler core and block_on the future if we can
+            // there, otherwise, lets select on a notification that the core is
+            // available or the future is complete.
+            loop {
+                if let Some(core) = self.take_core(handle) {
+                    todo!()
+                } else {
+                    todo!()
+                }
+            }
         })
+    }
+
+    fn take_core(&self, handle: &Arc<Handle>) -> Option<CoreGuard> {
+        let core = self.core.take()?;
+
+        todo!()
     }
 }
 
@@ -79,3 +99,9 @@ impl fmt::Debug for CurrentThread {
 /// Data required for executing the scheduler. The struct is passed around to
 /// a function that will perform the scheduling work and acts as a capability token.
 struct Core {}
+
+// ===== CoreGuard =====
+
+/// Used to ensure we always place the `Core` value back into its slot in
+/// `CurrentThread`, even if the future panics.
+struct CoreGuard {}
