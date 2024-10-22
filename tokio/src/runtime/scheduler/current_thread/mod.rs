@@ -1,8 +1,9 @@
 use crate::loom::sync::Arc;
 use crate::runtime::driver::{self, Driver};
-use crate::runtime::{blocking, Config, WorkerMetrics};
+use crate::runtime::{blocking, context, Config, WorkerMetrics};
 use crate::util::rand::RngSeedGenerator;
 use crate::util::WakerRef;
+use std::cell::RefCell;
 use std::future::Future;
 use std::{fmt, thread};
 
@@ -111,8 +112,8 @@ impl CurrentThread {
         Some(CoreGuard {
             context: scheduler::Context::CurrentThread(Context {
                 handle: handle.clone(),
-                /*  core: RefCell::new(Some(core)),
-                defer: Defer::new(), */
+                core: RefCell::new(Some(core)),
+                /* defer: Defer::new(), */
             }),
         })
     }
@@ -155,6 +156,11 @@ impl CoreGuard {
     {
         let context = self.context.expect_current_thread();
 
+        // Remove `core` from `context` to pass into the closure.
+        let core = context.core.borrow_mut().take().expect("core missing");
+
+        // Call the closure and place `core` back
+        let (core, ret) = context::set_scheduler(&self.context, || f(core, context));
         todo!()
     }
 }
@@ -170,4 +176,7 @@ struct Shared {
 pub(crate) struct Context {
     /// Scheduler handle
     handle: Arc<Handle>,
+    /// Scheduler core, enabling the holder of `Context` to execute the
+    /// scheduler.
+    core: RefCell<Option<Box<Core>>>,
 }
