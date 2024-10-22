@@ -1,3 +1,7 @@
+use std::cell::Cell;
+
+use runtime::EnterRuntime;
+
 use crate::runtime::scheduler;
 
 cfg_rt! {
@@ -16,6 +20,15 @@ struct Context {
     /// Handle to the runtime scheduler running on the current thread.
     #[cfg(feature = "rt")]
     current: current::HandleCell,
+
+        /// Tracks if the current thread is currently driving a runtime.
+    /// Note, that if this is set to "entered", the current scheduler
+    /// handle may not reference the runtime currently executing. This
+    /// is because other runtime handles may be set to current from
+    /// within a runtime.
+    #[cfg(feature = "rt")]
+    runtime: Cell<EnterRuntime>,
+
 }
 
 tokio_thread_local! {
@@ -24,5 +37,13 @@ tokio_thread_local! {
             // accessing drivers, etc...
             #[cfg(feature = "rt")]
             current: current::HandleCell::new(),
+            // Tracks if the current thread is currently driving a runtime.
+            // Note, that if this is set to "entered", the current scheduler
+            // handle may not reference the runtime currently executing. This
+            // is because other runtime handles may be set to current from
+            // within a runtime.
+            #[cfg(feature = "rt")]
+            runtime: Cell::new(EnterRuntime::NotEntered),
+
     } }
 }

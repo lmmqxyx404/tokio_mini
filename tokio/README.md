@@ -38,3 +38,7 @@ in runtime::blocking::poll
 ## code skills
 ### `use std::hash::{BuildHasher, Hash, Hasher};`
 The above traits are all useful
+
+### `#![allow(unknown_lints, unexpected_cfgs)]`
+set the cfg for cofigure compile.
+Otherwise, it will panic in `#[cfg(not(all(test, loom)))]`
