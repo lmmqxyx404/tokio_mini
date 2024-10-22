@@ -1,5 +1,6 @@
 use crate::loom::sync::Arc;
 use crate::runtime::driver::{self, Driver};
+use crate::runtime::metrics::MetricsBatch;
 use crate::runtime::{blocking, context, Config, WorkerMetrics};
 use crate::util::rand::RngSeedGenerator;
 use crate::util::{waker_ref, Wake, WakerRef};
@@ -86,7 +87,9 @@ impl CurrentThread {
             },
         });
 
-        let core = AtomicCell::new(Some(Box::new(Core {})));
+        let core = AtomicCell::new(Some(Box::new(Core {
+            metrics: MetricsBatch::new(&handle.shared.worker_metrics),
+        })));
 
         let scheduler = CurrentThread {
             core,
@@ -144,7 +147,10 @@ impl fmt::Debug for CurrentThread {
 
 /// Data required for executing the scheduler. The struct is passed around to
 /// a function that will perform the scheduling work and acts as a capability token.
-struct Core {}
+struct Core {
+    /// Metrics batch
+    metrics: MetricsBatch,
+}
 
 // ===== CoreGuard =====
 
@@ -160,6 +166,11 @@ impl CoreGuard {
         println!("start CoreGuard::block_on");
         let ret: Option<<F as Future>::Output> = self.enter(|mut core, context| {
             let waker = Handle::waker_ref(&context.handle);
+            let mut cx = std::task::Context::from_waker(&waker);
+
+            pin!(future);
+
+            core.metrics.start_processing_scheduled_tasks();
             todo!()
         });
         todo!()

@@ -1,6 +1,7 @@
 use crate::loom::sync::Arc;
 
 use std::mem::ManuallyDrop;
+use std::ops::Deref;
 use std::task::{RawWaker, RawWakerVTable, Waker};
 
 /// Simplified waking interface based on Arcs.
@@ -14,7 +15,17 @@ pub(crate) trait Wake: Send + Sync + Sized + 'static {
 
 /// A `Waker` that is only valid for a given lifetime.
 #[derive(Debug)]
-pub(crate) struct WakerRef {}
+pub(crate) struct WakerRef {
+    waker: ManuallyDrop<Waker>,
+}
+
+impl Deref for WakerRef {
+    type Target = Waker;
+
+    fn deref(&self) -> &Waker {
+        &self.waker
+    }
+}
 
 /// Creates a reference to a `Waker` from a reference to `Arc<impl Wake>`.
 pub(crate) fn waker_ref<W: Wake>(wake: &Arc<W>) -> WakerRef {
@@ -23,8 +34,8 @@ pub(crate) fn waker_ref<W: Wake>(wake: &Arc<W>) -> WakerRef {
     let waker = unsafe { Waker::from_raw(RawWaker::new(ptr, waker_vtable::<W>())) };
 
     WakerRef {
-       /*  waker: ManuallyDrop::new(waker),
-        _p: PhantomData, */
+        waker: ManuallyDrop::new(waker),
+        /* _p: PhantomData, */
     }
 }
 
