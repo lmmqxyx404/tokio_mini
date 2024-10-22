@@ -12,5 +12,8 @@ pub(crate) mod rand;
 pub(crate) mod atomic_cell;
 
 cfg_rt! {
-pub(crate) use self::rand::RngSeedGenerator;
+  pub(crate) use self::rand::RngSeedGenerator;
+
+  mod wake;
+  pub(crate) use wake::WakerRef;
 }

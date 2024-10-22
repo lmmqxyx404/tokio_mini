@@ -2,6 +2,7 @@ use crate::loom::sync::Arc;
 use crate::runtime::driver::{self, Driver};
 use crate::runtime::{blocking, Config, WorkerMetrics};
 use crate::util::rand::RngSeedGenerator;
+use crate::util::WakerRef;
 use std::future::Future;
 use std::{fmt, thread};
 
@@ -13,11 +14,25 @@ use crate::runtime::scheduler::{self};
 pub(crate) struct Handle {
     /// Current random number generator seed
     pub(crate) seed_generator: RngSeedGenerator,
+    /// Scheduler state shared across threads
+    shared: Shared,
 }
 
 impl fmt::Debug for Handle {
     fn fmt(&self, fmt: &mut fmt::Formatter<'_>) -> fmt::Result {
         fmt.debug_struct("current_thread::Handle { ... }").finish()
+    }
+}
+
+// ===== impl Handle =====
+
+impl Handle {
+    fn waker_ref(me: &Arc<Self>) -> WakerRef {
+        todo!()
+        /* // Set woken to true when enter block_on, ensure outer future
+        // be polled for the first time when enter loop
+        me.shared.woken.store(true, Release);
+        waker_ref(me) */
     }
 }
 
@@ -48,7 +63,10 @@ impl CurrentThread {
             .global_queue_interval
             .unwrap_or(DEFAULT_GLOBAL_QUEUE_INTERVAL);
 
-        let handle = Arc::new(Handle { seed_generator });
+        let handle = Arc::new(Handle {
+            seed_generator,
+            shared: Shared { worker_metrics },
+        });
 
         let core = AtomicCell::new(Some(Box::new(Core {})));
 
@@ -75,7 +93,11 @@ impl CurrentThread {
             // available or the future is complete.
             loop {
                 if let Some(core) = self.take_core(handle) {
-                    todo!()
+                    handle
+                        .shared
+                        .worker_metrics
+                        .set_thread_id(thread::current().id());
+                    return core.block_on(future);
                 } else {
                     todo!()
                 }
@@ -86,7 +108,7 @@ impl CurrentThread {
     fn take_core(&self, handle: &Arc<Handle>) -> Option<CoreGuard> {
         let core = self.core.take()?;
 
-        todo!()
+        Some(CoreGuard {})
     }
 }
 
@@ -105,3 +127,37 @@ struct Core {}
 /// Used to ensure we always place the `Core` value back into its slot in
 /// `CurrentThread`, even if the future panics.
 struct CoreGuard {}
+
+impl CoreGuard {
+    #[track_caller]
+    fn block_on<F: Future>(self, future: F) -> F::Output {
+        println!("start CoreGuard::block_on");
+        let ret: Option<<F as Future>::Output> = self.enter(|mut core, context| {
+            let waker = Handle::waker_ref(&context.handle);
+            todo!()
+        });
+        todo!()
+    }
+
+    /// Enters the scheduler context. This sets the queue and other necessary
+    /// scheduler state in the thread-local.
+    fn enter<F, R>(self, f: F) -> R
+    where
+        F: FnOnce(Box<Core>, &Context) -> (Box<Core>, R),
+    {
+        todo!()
+    }
+}
+/// Scheduler state shared between threads.
+struct Shared {
+    /// This scheduler only has one worker.
+    worker_metrics: WorkerMetrics,
+}
+
+/// Thread-local context.
+///
+/// pub(crate) to store in `runtime::context`.
+pub(crate) struct Context {
+    /// Scheduler handle
+    handle: Arc<Handle>,
+}
