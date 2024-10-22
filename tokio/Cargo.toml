@@ -30,8 +30,8 @@ time = []
 
 test-util = ["rt", "sync", "time"]
 
-[target.'cfg(loom)'.dev-dependencies]
-loom = { version = "0.7", features = ["futures", "checkpoint"] }
+# [target.'cfg(loom)'.dev-dependencies]
+# loom = { version = "0.7", features = ["futures", "checkpoint"] }
 
 # [lints.rust]
 # unexpected_cfgs = { level = "warn", check-cfg = ['cfg(loom)'] }
