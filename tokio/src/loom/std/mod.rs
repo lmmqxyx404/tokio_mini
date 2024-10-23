@@ -37,3 +37,9 @@ pub(crate) mod rand {
         hasher.finish()
     }
 }
+
+pub(crate) mod thread {
+
+    #[allow(unused_imports)]
+    pub(crate) use std::thread::AccessError;
+}

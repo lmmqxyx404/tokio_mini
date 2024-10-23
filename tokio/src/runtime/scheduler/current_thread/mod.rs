@@ -13,7 +13,8 @@ use crate::util::atomic_cell::AtomicCell;
 use crate::runtime::scheduler::{self};
 
 use crate::loom::sync::atomic::AtomicBool;
-use std::sync::atomic::Ordering::Release;
+use std::sync::atomic::Ordering::{AcqRel, Release};
+use std::task::Poll::Ready;
 
 /// Handle to the current thread scheduler
 pub(crate) struct Handle {
@@ -37,6 +38,11 @@ impl Handle {
         // be polled for the first time when enter loop
         me.shared.woken.store(true, Release);
         waker_ref(me)
+    }
+
+    // reset woken to false and return original value
+    pub(crate) fn reset_woken(&self) -> bool {
+        self.shared.woken.swap(false, AcqRel)
     }
 }
 
@@ -171,7 +177,23 @@ impl CoreGuard {
             pin!(future);
 
             core.metrics.start_processing_scheduled_tasks();
-            todo!()
+
+            'outer: loop {
+                let handle = &context.handle;
+
+                if handle.reset_woken() {
+                    let (c, res) = context.enter(core, || {
+                        crate::runtime::coop::budget(|| future.as_mut().poll(&mut cx))
+                    });
+
+                    core = c;
+
+                    if let Ready(v) = res {
+                        return (core, Some(v));
+                    }
+                }
+                todo!()
+            }
         });
         todo!()
     }
@@ -192,6 +214,7 @@ impl CoreGuard {
         todo!()
     }
 }
+
 /// Scheduler state shared between threads.
 struct Shared {
     /// This scheduler only has one worker.
@@ -209,4 +232,19 @@ pub(crate) struct Context {
     /// Scheduler core, enabling the holder of `Context` to execute the
     /// scheduler.
     core: RefCell<Option<Box<Core>>>,
+}
+
+impl Context {
+    fn enter<R>(&self, core: Box<Core>, f: impl FnOnce() -> R) -> (Box<Core>, R) {
+        // Store the scheduler core in the thread-local context
+        //
+        // A drop-guard is employed at a higher level.
+        *self.core.borrow_mut() = Some(core);
+        // Execute the closure while tracking the execution budget
+        let ret = f();
+
+        // Take the scheduler core back
+        let core = self.core.borrow_mut().take().expect("core missing");
+        (core, ret)
+    }
 }
