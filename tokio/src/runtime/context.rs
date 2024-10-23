@@ -5,6 +5,9 @@ use runtime::EnterRuntime;
 #[cfg(any(feature = "rt", feature = "macros", feature = "time"))]
 use crate::util::rand::FastRand;
 
+use crate::runtime::coop;
+use crate::loom::thread::AccessError;
+
 cfg_rt! {
 
 mod current;
@@ -40,6 +43,10 @@ struct Context {
     /// Handle to the scheduler's internal "context"
     #[cfg(feature = "rt")]
     scheduler: Scoped<scheduler::Context>,
+
+    /// Tracks the amount of "work" a task may still do before yielding back to
+    /// the scheduler
+    budget: Cell<coop::Budget>,
 }
 
 tokio_thread_local! {
@@ -61,6 +68,8 @@ tokio_thread_local! {
             // Tracks the current scheduler internal context
             #[cfg(feature = "rt")]
             scheduler: Scoped::new(),
+
+            budget: Cell::new(coop::Budget::unconstrained()),
     } }
 }
 
@@ -68,4 +77,9 @@ cfg_rt! {
     pub(super) fn set_scheduler<R>(v: &scheduler::Context, f: impl FnOnce() -> R) -> R {
         CONTEXT.with(|c| c.scheduler.set(v, f))
     }
+}
+
+
+pub(super) fn budget<R>(f: impl FnOnce(&Cell<coop::Budget>) -> R) -> Result<R, AccessError> {
+    CONTEXT.try_with(|ctx| f(&ctx.budget))
 }

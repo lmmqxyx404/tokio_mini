@@ -46,3 +46,5 @@ pub(crate) mod park;
 cfg_time! {
     pub(crate) mod time;
 }
+
+pub(crate) mod coop;
