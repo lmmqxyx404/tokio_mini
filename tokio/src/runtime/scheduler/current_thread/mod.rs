@@ -195,7 +195,14 @@ impl CoreGuard {
                 todo!()
             }
         });
-        todo!()
+
+        match ret {
+            Some(ret) => ret,
+            None => {
+                // `block_on` panicked.
+                panic!("a spawned task panicked and the runtime is configured to shut down on unhandled panic");
+            }
+        }
     }
 
     /// Enters the scheduler context. This sets the queue and other necessary
@@ -211,7 +218,10 @@ impl CoreGuard {
 
         // Call the closure and place `core` back
         let (core, ret) = context::set_scheduler(&self.context, || f(core, context));
-        todo!()
+
+        *context.core.borrow_mut() = Some(core);
+
+        ret
     }
 }
 
