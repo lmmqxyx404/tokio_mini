@@ -25,6 +25,7 @@ pub(crate) struct SetCurrentGuard {
 ///
 /// [`Handle`]: crate::runtime::scheduler::Handle
 pub(crate) fn try_set_current(handle: &scheduler::Handle) -> Option<SetCurrentGuard> {
+    println!("current  try_set_current");
     CONTEXT.try_with(|ctx| ctx.set_current(handle)).ok()
 }
 

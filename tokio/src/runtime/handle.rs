@@ -75,6 +75,7 @@ impl Handle {
     /// [`TcpStream`]: struct@crate::net::TcpStream
     /// [`tokio::spawn`]: fn@crate::spawn
     pub fn enter(&self) -> EnterGuard<'_> {
+        println!("Handle  enter");
         EnterGuard {
             _guard: match context::try_set_current(&self.inner) {
                 Some(guard) => guard,
