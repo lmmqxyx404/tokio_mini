@@ -49,6 +49,7 @@ impl Runtime {
     }
 
     pub fn enter(&self) -> EnterGuard<'_> {
+        println!("Runtime: enter");
         self.handle.enter()
     }
 }
