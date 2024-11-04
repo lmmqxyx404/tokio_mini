@@ -93,3 +93,13 @@ macro_rules! cfg_not_unstable_metrics {
       )*
   }
 }
+
+macro_rules! cfg_net {
+  ($($item:item)*) => {
+      $(
+          #[cfg(feature = "net")]
+          #[cfg_attr(docsrs, doc(cfg(feature = "net")))]
+          $item
+      )*
+  }
+}
